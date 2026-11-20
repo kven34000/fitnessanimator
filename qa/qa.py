@@ -12,8 +12,10 @@ name = sys.argv[1]
 OUT = f'/home/claude/qa/{name}'; os.makedirs(OUT, exist_ok=True)
 STEP = 0.25
 
-if name in ('six', 'sai'):
+if name in ('six', 'sai', 'walk'):
     if name == 'six': sys.path.insert(0, '/home/claude/v2_6ex'); import render_6ex as X
+    elif name == 'walk':
+        sys.path.insert(0, '/home/claude/fitnessanimator/videos/04_walking_belly_fat'); _a = sys.argv; sys.argv = ['x']; import render_walk as X; sys.argv = _a
     else: sys.path.insert(0, '/home/claude/v3_sai'); import render_sai as X
     R = X.R
     DUR = X.DUR; to_eng = lambda T: T; to_out = lambda t: t
@@ -28,7 +30,7 @@ else:
     WORDS = list(EW)
 R.init()
 WD, HT = R.WD, R.HT
-UIK = {'chip', 'title', 'big', 'inset', 'card', 'bubble', 'calendar', 'countdown', 'measure', 'count', 'days', 'blocks', 'sub'}
+UIK = {'chip', 'title', 'big', 'inset', 'card', 'bubble', 'calendar', 'countdown', 'measure', 'count', 'days', 'blocks', 'sub', 'meter'}
 
 def norm(s): return re.sub(r'[^a-z0-9%]', '', s.lower())
 issues = {k: [] for k in ('text_char', 'text_text', 'text_edge', 'sub_jump', 'timing', 'char_edge', 'jitter', 'static', 'pose_run')}

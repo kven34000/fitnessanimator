@@ -13,9 +13,16 @@ elif LANG in ('sai', 'saivo'):
     import render_sai as X
     R = X.R; TM = lambda t: t; VO = None; OUT = '/home/claude/v3_sai/mix_novo.wav'
     if LANG == 'saivo': VO = '/home/claude/v3_sai/vo/vo_en.mp3'; OUT = '/home/claude/v3_sai/mix_vo.wav'
+elif LANG in ('walk', 'walkvo'):
+    WD_ = '/home/claude/fitnessanimator/videos/04_walking_belly_fat'
+    sys.path.insert(0, WD_); _argv = sys.argv; sys.argv = ['x']
+    import render_walk as X
+    sys.argv = _argv
+    R = X.R; TM = lambda t: t; VO = None; OUT = WD_ + '/mix_novo.wav'
+    if LANG == 'walkvo': VO = WD_ + '/vo/vo_en.mp3'; OUT = WD_ + '/mix_vo.wav'
 else:
     import render_v2 as R
-if LANG in ('six', 'sixvo', 'sai', 'saivo'): pass
+if LANG in ('six', 'sixvo', 'sai', 'saivo', 'walk', 'walkvo'): pass
 elif LANG == 'en':
     from timewarp import to_en, EN_DUR
     TM = to_en; R.DUR = EN_DUR; VO = '/home/claude/en/vo_en_raw.mp3'; OUT = '/home/claude/en/mix_en.wav'
@@ -122,7 +129,7 @@ for e in R.EL:
         add(fx, SL, t0, 1.0); add(fx, SL, t0 + 0.2, 1.0); add(fx, nxt(IMPS, 'i'), t0 + 0.2, 0.5)
 for (st, du) in R.SHAKES:
     add(fx, nxt(IMPS, 'i'), st, 1.0)
-if LANG not in ('six', 'sixvo', 'sai', 'saivo'): add(fx, nxt(POPS, 'p'), 73.28, 1.0)
+if LANG not in ('six', 'sixvo', 'sai', 'saivo', 'walk', 'walkvo'): add(fx, nxt(POPS, 'p'), 73.28, 1.0)
 for e in R.EL:
     k = e['k']
     if k == 'loc':
