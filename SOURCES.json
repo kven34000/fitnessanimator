@@ -1,0 +1,27 @@
+{
+  "_note": "Имя ассета -> ID в Magnific (creations_get). Ссылки на файлы временные, получать заново по ID.",
+  "character": {"neonfit": "персонаж @neonfit в Magnific (Characters)"},
+  "voice": {
+    "six_moves_en": {"creation": "CqnpfeKEEy", "voice_id": 1472, "voice": "Alistair Ashford", "model": "eleven_v4", "stability": 0.3, "credits": 1038}
+  },
+  "sheets": {
+    "pullup": "xSBpPWqjfW", "pullup_plate": "nVslZaTYQD",
+    "rowbar": "VX7SEQrMMU", "rowbar_plate": "VX7JYWLMMU",
+    "sidepull": "cpSsaQL0eP", "sidepull_plate": "gOmhEbPSXO",
+    "dips_45": "Lw8dN3fswO", "dips_45_plate": "ksedqzZ16B",
+    "decline": "UPvIZCfwny", "decline_plate": "u5WcaX3QLD",
+    "benchdip": "aFGRj6wfSh", "benchdip_plate": "gOmhurdSXO",
+    "benchpress": "Lw8XRYFswO", "benchpress_plate": "gOmhLYVSXO",
+    "weightdip_45": "MBJS9rSDCm", "weightdip_45_plate": "Lw8IrvEswO",
+    "fatbar": "MBJSPQrDCm", "fatbar_plate": "5jDpIH5Kxe",
+    "bulgarian": "N2qu0Sy6D9", "bulgarian_plate": "w4afbda7EI", "bulgarian_noeq": "w4afbBC7EI",
+    "dipf (dips front)": "gOmaAbISXO", "dipf_noeq": "dt46kOIXSL", "dipf_plate": "4RFberq9Aa", "dipf_mus": "gOmacNKSXO",
+    "wdipf (weighted dips front)": "w4aEYzl7EI", "wdipf_noeq": "N2qKBWV6D9", "wdipf_plate": "CqncJJLEEy",
+    "inverted_row_base (upload)": "SyhQiGEUb8",
+    "tablerow": "5jD8wpNKxe", "tablerow_noeq": "u5WpSrYQLD", "tablerow_plate": "1ldm93Gr4r", "tablerow_mus": "gOmHygcSXO",
+    "situp": "tCR0ejdmZJ", "plank": "KLphuGokqp", "legraise": "0eU6AguTfW",
+    "sore": "SyhqrudUb8", "hair": "xSBCqHYjfW",
+    "hero_black": "DoOZYD0pcl", "hero_yellow": "lJtqc6tgv9"
+  },
+  "_missing": "ID остальных листов (базовые позы, fatrobe, lab, wheel, heavysquat, latpull, shoulder, fingers, stop, pray, tired, notepad, lazy, facepalm, tools, stretch, thumbs2, dumbbell, rdl, pain, row, pushup) не записаны; PNG лежат в sprites2d/sheets."
+}
