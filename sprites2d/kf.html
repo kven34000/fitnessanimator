@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><style>html,body{margin:0;background:transparent}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script></head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import * as THREE from 'three';
+const W=1920,H=1080;
+const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),alpha:true,antialias:true,preserveDrawingBuffer:true});
+r.setClearColor(0x000000,0);
+const scene=new THREE.Scene();const cam=new THREE.OrthographicCamera(0,W,0,H,-10,10);cam.position.z=5;
+const L={};window.L=L;
+const uGlow={value:0},uTime={value:0};
+window.init=async(P)=>{
+  const tl=new THREE.TextureLoader();
+  for(const ly of P.layers){
+    const tex=await tl.loadAsync(ly.tex);tex.colorSpace=THREE.SRGBColorSpace;tex.flipY=false;tex.anisotropy=8;tex.minFilter=THREE.LinearMipmapLinearFilter;
+    const mtex=await tl.loadAsync(ly.mus||'mus.png');mtex.flipY=false;mtex.minFilter=mtex.magFilter=THREE.LinearFilter;
+    const g=new THREE.BufferGeometry();const n=ly.verts.length;
+    const pos=new Float32Array(n*3),uv=new Float32Array(n*2);
+    ly.verts.forEach((v,i)=>{uv[i*2]=v[0]/P.W;uv[i*2+1]=v[1]/P.H;});
+    g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setIndex(ly.tris);
+    const mat=new THREE.ShaderMaterial({transparent:true,depthTest:false,side:THREE.DoubleSide,uniforms:{op:{value:1.0},map:{value:tex},mus:{value:mtex},w0:{value:new THREE.Vector4()},w1:{value:new THREE.Vector4()},w2:{value:new THREE.Vector4()},w3:{value:new THREE.Vector4()},uTime},
+      vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+      fragmentShader:`uniform float op;uniform sampler2D map;uniform sampler2D mus;uniform vec4 w0,w1,w2,w3;uniform float uTime;varying vec2 vUv;
+      void main(){vec4 c=texture2D(map,vUv);vec4 m=texture2D(mus,vUv);
+        // mus.png: r = muscle id/16 (nearest-ish), g = mask strength
+        float id=floor(m.r*15.0+0.5);float wsel=0.0;
+        for(int k=0;k<4;k++){ if(abs(id-float(k))<0.5) wsel=w0[k]; if(abs(id-float(k+4))<0.5) wsel=w1[k]; if(abs(id-float(k+8))<0.5) wsel=w2[k]; if(abs(id-float(k+12))<0.5) wsel=w3[k]; }
+        float mk=m.g*wsel;
+        vec3 lit=c.rgb;float lum=dot(lit,vec3(0.299,0.587,0.114));
+        float pul=0.9+0.1*sin(uTime*6.0);
+        vec3 gl=vec3(0.15,1.0,0.4)*(0.35+0.85*lum)*pul;
+        c.rgb=mix(lit,gl,mk*0.85);
+        gl_FragColor=vec4(c.rgb,c.a*op);}`});
+    const mesh=new THREE.Mesh(g,mat);mesh.frustumCulled=false;scene.add(mesh);L[ly.name]=mesh;
+  }
+  return Object.keys(L);
+};
+window.draw=(fr)=>{ // fr: {layers:{name:[x,y,...]}, order:[names], w:[16], t}
+  uTime.value=fr.t||0;
+  for(const nm in L)L[nm].visible=false;let k=0;for(const nm of fr.order){const m=L[nm];m.visible=true;m.renderOrder=k++;m.material.uniforms.op.value=(fr.op&&fr.op[nm]!=null)?fr.op[nm]:1.0;const a=m.geometry.attributes.position.array;const v=fr.layers[nm];
+    for(let i=0;i<v.length/2;i++){a[i*3]=v[i*2];a[i*3+1]=v[i*2+1];a[i*3+2]=0;}m.geometry.attributes.position.needsUpdate=true;
+    const w=fr.w||new Array(16).fill(0);m.material.uniforms.w0.value.set(w[0],w[1],w[2],w[3]);m.material.uniforms.w1.value.set(w[4],w[5],w[6],w[7]);m.material.uniforms.w2.value.set(w[8],w[9],w[10],w[11]);m.material.uniforms.w3.value.set(w[12],w[13],w[14],w[15]);}
+  r.render(scene,cam);
+};
+window.grab=()=>document.getElementById('c').toDataURL('image/png');
+window.ready=true;
+</script></body></html>
