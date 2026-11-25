@@ -40,6 +40,7 @@
 ## Хранение и доставка
 - Всё нужное для пересборки (код, сценарии, спрайты, листы, фоны, тайминги голоса, уроки, ID Magnific) — в этом репозитории. mp4/wav/mp3 — не в git.
 - Готовые ролики — на Mac автора: `~/Documents/Clode/Fitness Animator/Long EN/NN · <Title>.mp4` (черновики на проверку — `~/Documents/Clode/Fitness Animator/Review/`, обложки — `Covers EN/`). Доступ: `device_request_folder_access ~/Documents/Clode`. Файл: SendUserFile → file_uuid → `device_commit_files`, затем сверить размер.
+- Файлы одного чата не видны в другом (видна только переписка): каждый черновик тоже кладём в `Review/`, финал — в `Long EN/`.
 - Работа может идти в нескольких чатах параллельно: перед пушем `git fetch --depth=50 origin main` и `git rebase FETCH_HEAD`.
 
 ## Чего не делать без спроса
