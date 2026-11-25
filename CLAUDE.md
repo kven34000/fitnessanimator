@@ -37,6 +37,11 @@
 3. Новые уроки в `lessons/INDEX.md`, новые ID в `SOURCES.json`.
 4. Коммит и пуш. Видео, wav и mp3 — не в git.
 
+## Хранение и доставка
+- Всё нужное для пересборки (код, сценарии, спрайты, листы, фоны, тайминги голоса, уроки, ID Magnific) — в этом репозитории. mp4/wav/mp3 — не в git.
+- Готовые ролики — на Mac автора: `~/Documents/Clode/Fitness Animator/Long EN/NN · <Title>.mp4` (черновики на проверку — `~/Documents/Clode/Fitness Animator/Review/`, обложки — `Covers EN/`). Доступ: `device_request_folder_access ~/Documents/Clode`. Файл: SendUserFile → file_uuid → `device_commit_files`, затем сверить размер.
+- Работа может идти в нескольких чатах параллельно: перед пушем `git fetch --depth=50 origin main` и `git rebase FETCH_HEAD`.
+
 ## Чего не делать без спроса
 - Не тратить кредиты Magnific сверх согласованной суммы.
 - Не удалять файлы из репозитория и проекта Claude.
