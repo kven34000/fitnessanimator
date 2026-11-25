@@ -1,0 +1,15 @@
+<html><body style="margin:0;background:#000"><canvas id=c width=1920 height=1080></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true});
+const s=new THREE.Scene();s.background=new THREE.Color(0x0a0306);
+const cam=new THREE.PerspectiveCamera(35,16/9,0.1,100);cam.position.set(0,1.2,5);cam.lookAt(0,1,0);
+const g=new THREE.TorusKnotGeometry(0.6,0.2,300,40);
+const m=new THREE.MeshToonMaterial({color:0xd9a07a});
+const k=new THREE.Mesh(g,m);k.position.y=1;s.add(k);
+s.add(new THREE.AmbientLight(0x552222,1));const L=new THREE.DirectionalLight(0xffffff,2.5);L.position.set(2,3,4);s.add(L);
+const R=new THREE.DirectionalLight(0xff2040,4);R.position.set(-3,1,-2);s.add(R);
+window.frame=(t)=>{k.rotation.y=t;r.render(s,cam);return true};
+window.ready=true;
+</script></body></html>

@@ -1,0 +1,431 @@
+<html><body style="margin:0;background:#000;overflow:hidden">
+<canvas id=c width=1920 height=1080></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {BVHLoader} from 'three/addons/loaders/BVHLoader.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
+
+const W=1920,H=1080;
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:false,preserveDrawingBuffer:true});
+renderer.setSize(W,H,false);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.NoToneMapping;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050103);
+scene.fog=new THREE.Fog(0x070205,4,12);
+const camera=new THREE.PerspectiveCamera(30,W/H,0.05,50);
+
+// lights: key white, red rims
+const hemi=new THREE.HemisphereLight(0xffe6e6,0x220008,1.0);scene.add(hemi);
+const key=new THREE.DirectionalLight(0xffffff,1.9);key.position.set(2.6,3.2,2.2);scene.add(key);
+const rimL=new THREE.DirectionalLight(0xff1e3c,2.6);rimL.position.set(-3,2,-2.5);scene.add(rimL);
+const rimR=new THREE.DirectionalLight(0xff1e3c,1.8);rimR.position.set(3,1.5,-2.5);scene.add(rimR);
+
+// floor: dark plane + neon grid
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshBasicMaterial({color:0x0b0306}));
+floor.rotation.x=-Math.PI/2;scene.add(floor);
+const grid=new THREE.GridHelper(40,80,0xff1e3c,0x8a0f22);grid.position.y=0.002;
+grid.material.transparent=true;grid.material.opacity=0.35;scene.add(grid);
+// back neon frame lines
+const lineMat=new THREE.MeshBasicMaterial({color:0xff2040});
+for(const y of [2.6,2.75]){const l=new THREE.Mesh(new THREE.BoxGeometry(30,0.012,0.012),lineMat);l.userData.glow=true;l.position.set(0,y,-4);scene.add(l);}
+// glow disc under character
+const disc=new THREE.Mesh(new THREE.RingGeometry(0.35,0.42,64),new THREE.MeshBasicMaterial({color:0xff2040,transparent:true,opacity:0.9,side:THREE.DoubleSide}));
+disc.userData.glow=true;disc.rotation.x=-Math.PI/2;disc.position.y=0.004;scene.add(disc);
+// particles
+const pg=new THREE.BufferGeometry();const N=400;const pp=new Float32Array(N*3);
+for(let i=0;i<N;i++){pp[i*3]=(Math.random()-0.5)*14;pp[i*3+1]=Math.random()*5;pp[i*3+2]=-6+Math.random()*7;}
+pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+const parts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xff3050,size:0.025,transparent:true,opacity:0.8}));scene.add(parts);
+
+// ---- muscle regions (bind space of the model: forward +X, up +Y, lateral Z) ----
+const MUSCLES=['quads','hams','glutes','calves','abs','obliques','lowback','pecs','delts','biceps','triceps','lats','traps','knees','ankles','hipjoint','forearms'];
+const uM={};for(const m of MUSCLES)uM['m_'+m]={value:0};
+const uTime={value:0};const uOW={value:0.0016};const uDebug={value:0};const uBloomOnly={value:0};
+const uHi={value:new THREE.Color(0xff1030)};
+
+const MUSCLE_GLSL=`
+float band(float v,float a,float b,float s){s*=0.45;return smoothstep(a-s,a+s,v)*(1.0-smoothstep(b-s,b+s,v));}
+float sph(vec3 p,vec3 c,vec3 r){vec3 d=(p-c)/r;return 1.0-smoothstep(0.82,1.0,length(d));}
+float muscleMask(vec3 p){
+  float az=abs(p.z);
+  float m=0.0;
+  float leg=band(az,0.012,0.115,0.01);
+  // legs: thigh 0.29..0.50
+  float thigh=band(p.y,0.30,0.425,0.02)*leg;
+  float frontLeg=smoothstep(-0.02,0.01,p.x+0.012);
+  m=max(m,m_quads*thigh*frontLeg);
+  m=max(m,m_hams*thigh*(1.0-frontLeg));
+  m=max(m,m_glutes*band(p.y,0.43,0.56,0.02)*(1.0-smoothstep(-0.03,0.0,p.x+0.015))*band(az,0.0,0.11,0.01));
+  m=max(m,m_calves*band(p.y,0.10,0.27,0.02)*leg*(1.0-smoothstep(-0.02,0.0,p.x+0.02)));
+  m=max(m,m_knees*max(sph(p,vec3(0.0,0.286,0.078),vec3(0.055,0.05,0.05)),sph(p,vec3(0.0,0.286,-0.078),vec3(0.055,0.05,0.05))));
+  m=max(m,m_ankles*max(sph(p,vec3(-0.029,0.075,0.094),vec3(0.05,0.04,0.04)),sph(p,vec3(-0.029,0.075,-0.094),vec3(0.05,0.04,0.04))));
+  m=max(m,m_hipjoint*max(sph(p,vec3(0.0,0.50,0.075),vec3(0.06,0.06,0.05)),sph(p,vec3(0.0,0.50,-0.075),vec3(0.06,0.06,0.05))));
+  // torso
+  float torsoW=band(az,0.0,0.105,0.01);
+  float front=smoothstep(0.0,0.03,p.x+0.005);
+  float back=(1.0-smoothstep(-0.03,0.0,p.x+0.03));
+  m=max(m,m_abs*band(p.y,0.55,0.69,0.015)*band(az,0.0,0.05,0.01)*front);
+  m=max(m,m_obliques*band(p.y,0.55,0.67,0.015)*band(az,0.045,0.10,0.01)*smoothstep(-0.03,0.0,p.x));
+  m=max(m,m_lowback*band(p.y,0.54,0.64,0.015)*band(az,0.0,0.07,0.01)*back);
+  m=max(m,m_pecs*band(p.y,0.69,0.77,0.015)*band(az,0.0,0.10,0.01)*front);
+  m=max(m,m_lats*band(p.y,0.62,0.76,0.015)*band(az,0.04,0.11,0.01)*back);
+  m=max(m,m_traps*band(p.y,0.76,0.83,0.015)*band(az,0.0,0.09,0.01)*back);
+  // arms in T-pose along z
+  m=max(m,m_delts*band(az,0.095,0.15,0.012)*band(p.y,0.73,0.83,0.02));
+  float upper=band(az,0.15,0.255,0.01)*band(p.y,0.73,0.84,0.02);
+  m=max(m,m_biceps*upper*smoothstep(-0.012,0.012,p.x+0.02));
+  m=max(m,m_triceps*upper*(1.0-smoothstep(-0.012,0.012,p.x+0.02)));
+  m=max(m,m_forearms*band(az,0.27,0.40,0.01)*band(p.y,0.74,0.83,0.02));
+  return clamp(m,0.0,1.0);
+}`;
+
+function patchSkin(mat){
+  mat.onBeforeCompile=(sh)=>{
+    Object.assign(sh.uniforms,uM,{uTime,uHi,uDebug,uBloomOnly});
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRest;').replace('#include <begin_vertex>','#include <begin_vertex>\nvRest=vec3(position.z,position.y,-position.x)/1.8;');
+    const decl=MUSCLES.map(m=>'uniform float m_'+m+';').join('\n');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vRest;uniform float uBloomOnly;uniform float uDebug;uniform float uTime;uniform vec3 uHi;\n'+decl+MUSCLE_GLSL)
+      .replace('#include <dithering_fragment>',`#include <dithering_fragment>
+        float mk=muscleMask(vRest);
+        float pul=0.88+0.12*sin(uTime*6.0);
+        vec3 lit=gl_FragColor.rgb;
+        float lum=dot(lit,vec3(0.299,0.587,0.114));
+        vec3 gcol=vec3(0.12,1.0,0.38);
+        vec3 glowLit=lit*vec3(0.12,1.15,0.42)*1.5*pul + gcol*0.13;
+        float mshape=smoothstep(0.02,0.18,mk);gl_FragColor.rgb=mix(lit,glowLit*(0.55+0.55*mk),mshape);
+        if(uBloomOnly>0.5){gl_FragColor=vec4(gcol*mk*0.04*(0.4+lum),1.0);}
+        if(uDebug>0.5){float s=step(0.5,fract(vRest.y*10.0));gl_FragColor.rgb=vec3(s, step(0.0,vRest.x)*0.8, step(0.0,vRest.z)*0.8);}`);
+  };
+}
+
+// toon gradient
+const gm=new THREE.DataTexture(new Uint8Array([105,105,105,255, 170,170,170,255, 245,245,245,255]),3,1);
+gm.minFilter=gm.magFilter=THREE.NearestFilter;gm.needsUpdate=true;
+
+let model,skinned,bones={},rest={},restWorld={};
+const charRoot=new THREE.Group();scene.add(charRoot);
+const props={};
+
+
+// ---------- shorts shell: separate inflated cloth over the painted trunks ----------
+function buildShorts(o, img){
+  // clean cloth shell: vertex band between hem and waist (native units), inflated, solid fabric + neon trims
+  const g=o.geometry;const P=g.attributes.position,N=g.attributes.normal;const n=P.count;
+  const ny=i=>P.getY(i)/1.8;   // native height
+  const Y0=window.SH_HEM??0.425, Y1=window.SH_WAIST??0.565;
+  const isS=new Uint8Array(n);
+  for(let i=0;i<n;i++){const y=ny(i);const nz=Math.abs(P.getX(i)/1.8);if(y>=Y0-0.004&&y<=Y1+0.004&&nz<0.2)isS[i]=1;}
+  const idx=g.index.array;const tri=[];
+  const near=new Uint8Array(n);for(let i=0;i<n;i++){const y=ny(i);const nz=Math.abs(P.getX(i)/1.8);if(y>=Y0-0.03&&y<=Y1+0.03&&nz<0.2)near[i]=1;}
+  for(let t=0;t<idx.length;t+=3){const a=idx[t],b=idx[t+1],c=idx[t+2];if(near[a]&&near[b]&&near[c]&&(isS[a]+isS[b]+isS[c])>=1)tri.push(a,b,c);}
+  const sg=g.clone();sg.setIndex(tri);
+  const pos=sg.attributes.position,nor=sg.attributes.normal;
+  for(let i=0;i<pos.count;i++){if(!near[i])continue;let y=ny(i);
+    if(y<Y0){pos.setY(i,Y0*1.8);y=Y0;} if(y>Y1){pos.setY(i,Y1*1.8);y=Y1;}
+    const flare=Math.max(0,Math.min(1,(0.47-y)/0.045));const off=1.8*(0.004+0.007*flare);
+    pos.setXYZ(i,pos.getX(i)+nor.getX(i)*off,pos.getY(i)+nor.getY(i)*off,pos.getZ(i)+nor.getZ(i)*off);}
+  pos.needsUpdate=true;
+  const mat=new THREE.MeshToonMaterial({color:0x1a1a20,gradientMap:gm,side:THREE.DoubleSide});
+  patchSkin(mat);const _mb=mat.onBeforeCompile;
+  mat.onBeforeCompile=(sh)=>{_mb(sh);
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying float vY;').replace('#include <begin_vertex>','#include <begin_vertex>\nvY=position.y/1.8;');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying float vY;uniform float uHem;uniform float uWaist;')
+      .replace('#include <dithering_fragment>',`#include <dithering_fragment>
+        float trim=max(1.0-smoothstep(0.0,0.006,abs(vY-(uHem+0.006))),1.0-smoothstep(0.0,0.006,abs(vY-(uWaist-0.008))));
+        gl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(1.0,0.03,0.12),trim*0.95);`);
+    sh.uniforms.uHem={value:Y0};sh.uniforms.uWaist={value:Y1};};
+  const sm=new THREE.SkinnedMesh(sg,mat);sm.userData.glowSkin=true;sm.frustumCulled=false;sm.bind(o.skeleton,o.bindMatrix);o.parent.add(sm);
+  const ol=new THREE.SkinnedMesh(sg,outlineMat());ol.frustumCulled=false;ol.bind(o.skeleton,o.bindMatrix);o.parent.add(ol);
+  return tri.length/3;
+}
+function outlineMat(){
+  const m=new THREE.MeshBasicMaterial({color:0x2a0a0c,side:THREE.BackSide});
+  m.onBeforeCompile=(sh)=>{sh.uniforms.uOW=uOW;sh.vertexShader='uniform float uOW;\n'+sh.vertexShader;sh.vertexShader=sh.vertexShader.replace('#include <skinning_vertex>','#include <skinning_vertex>\ntransformed+=normalize(objectNormal)*uOW;')
+    .replace('#include <beginnormal_vertex>','#include <beginnormal_vertex>');};
+  return m;
+}
+
+window.load=async(tex)=>{window.TEX=tex;if(tex)window._TEXOBJ=await new THREE.TextureLoader().loadAsync(tex);
+  const g=await new GLTFLoader().loadAsync(window.MODEL||'hero_AirSquat.glb');
+  model=g.scene;
+  model.traverse(o=>{
+    if(o.isSkinnedMesh&&!skinned){skinned=o;o.userData.glowSkin=true;o.frustumCulled=false;
+      let map=o.material.map;
+      if(window.TEX){map=window._TEXOBJ;map.flipY=false;map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=8;}
+      const mat=new THREE.MeshToonMaterial({map,gradientMap:gm});
+      patchSkin(mat);o.material=mat;
+      const ol=new THREE.SkinnedMesh(o.geometry,outlineMat());ol.frustumCulled=false;
+      ol.bind(o.skeleton,o.bindMatrix);o.parent.add(ol);
+      if(window.SHORTS!==false&&map&&map.image)window._shortsTris=buildShorts(o,map.image);
+    }
+    if(o.isBone)bones[o.name]=o;
+  });
+  charRoot.add(model);
+  model.updateMatrixWorld(true);
+  mixer=new THREE.AnimationMixer(model);
+  window._fingerRest={};for(const n in bones){if(/Hand(Thumb|Index|Middle|Ring|Pinky)/.test(n))window._fingerRest[n]=bones[n].quaternion.clone();}
+  CLIPS['AirSquat']=g.animations[0];makeProps();
+  return Object.keys(bones).length;
+};
+let mixer=null;const CLIPS={};const ACTS={};
+window.loadClip=async(name,url)=>{const g=await new GLTFLoader().loadAsync(url);const c=g.animations[0];c.name=name;CLIPS[name]=c;return c.duration;};
+function act(name){if(!ACTS[name]){const a=mixer.clipAction(CLIPS[name]);a.play();ACTS[name]=a;}return ACTS[name];}
+function applyClips(st){
+  for(const n in ACTS){ACTS[n].weight=0;ACTS[n].enabled=true;}
+  const list=st.clips||[];
+  for(const c of list){const a=act(c.name);a.time=c.time;a.weight=c.w??1;a.setEffectiveWeight(c.w??1);}
+  mixer.update(0);
+  if(st.fingers!=='anim'){for(const n in window._fingerRest){const q=window._fingerRest[n].clone();const k=st.fingerCurl??0.12;if(k){const ax=new THREE.Vector3(0,0,1);q.multiply(new THREE.Quaternion().setFromAxisAngle(ax,k*(/Thumb/.test(n)?0.3:1)));}bones[n].quaternion.copy(q);}}
+  // root motion lock (keep hips over origin on XZ)
+  const hips=bones['mixamorigHips'];
+  if(hips){ model.updateMatrixWorld(true);
+    if(!window._hipsRest){window._hipsRest=null;}
+    const w=new THREE.Vector3();hips.getWorldPosition(w);
+    if(st.lockXZ!==false){w.x=charRoot.position.x;w.z=charRoot.position.z;}
+    if(st.hipsY!==undefined)w.y+=st.hipsY*charRoot.scale.x;
+    hips.position.copy(hips.parent.worldToLocal(w)); }
+}
+// pose: map boneName -> [axis(x,y,z in model native space), angle]; list applied as delta in rest-world frame
+const AX={};
+const tmpQ=new THREE.Quaternion();
+function applyPose(pose){
+  for(const n in bones)bones[n].quaternion.copy(rest[n]);
+  const mq=model.quaternion.clone();
+  for(const [n,rots] of Object.entries(pose.bones||{})){
+    const b=bones[n];if(!b)continue;
+    // delta in model-native space -> world: mq * d * mq^-1
+    let d=new THREE.Quaternion();
+    for(const [ax,ang] of rots){const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(...ax).normalize(),ang);d.premultiply(q);}
+    const dW=mq.clone().multiply(d).multiply(mq.clone().invert());
+    const rw=restWorld[n];
+    // local offset = rw^-1 * dW * rw
+    const off=rw.clone().invert().multiply(dW).multiply(rw);
+    b.quaternion.copy(rest[n]).multiply(off);
+  }
+  const rp=rest.__rootPos.clone();
+  if(pose.root){ // root offset in model native space (root bone has its own rotation; convert)
+    const parentInv=new THREE.Matrix4().copy(bones['tripoRoot'].parent.matrixWorld).invert();
+    model.updateMatrixWorld(true);
+    const wp=new THREE.Vector3();bones['tripoRoot'].parent.localToWorld(wp.copy(rp));
+    const off=new THREE.Vector3(...pose.root).applyQuaternion(model.quaternion).multiplyScalar(charRoot.scale.x);
+    wp.add(off);
+    bones['tripoRoot'].position.copy(wp.applyMatrix4(parentInv));
+  } else bones['tripoRoot'].position.copy(rp);
+}
+
+
+// ================= BVH retargeting (absolute direction matching) =================
+const SRC={};
+const restPos={};
+window.loadBVH=async(name,url)=>{
+  const txt=await (await fetch(url)).text();
+  const r=new BVHLoader().parse(txt);
+  const grp=new THREE.Group();grp.add(r.skeleton.bones[0]);
+  const mixer=new THREE.AnimationMixer(grp);const act=mixer.clipAction(r.clip);act.play();
+  const byName={};for(const b of r.skeleton.bones)byName[b.name]=b;
+  SRC[name]={grp,mixer,act,clip:r.clip,b:byName};
+  return r.clip.duration;
+};
+function srcPose(name,t){const S=SRC[name];S.act.time=t;S.mixer.update(0);S.grp.updateMatrixWorld(true);
+  const P={};for(const n in S.b){P[n]=new THREE.Vector3();S.b[n].getWorldPosition(P[n]);}return P;}
+const V=(a,b)=>new THREE.Vector3().subVectors(b,a);
+function basis(up,lat){const u=up.clone().normalize();const l=lat.clone().sub(u.clone().multiplyScalar(lat.dot(u))).normalize();const f=new THREE.Vector3().crossVectors(l,u);
+  return new THREE.Matrix4().makeBasis(l,u,f);}
+function qFrom2(up0,lat0,up,lat){const m0=basis(up0,lat0),m1=basis(up,lat);
+  const r=new THREE.Matrix4().multiplyMatrices(m1,m0.clone().transpose());return new THREE.Quaternion().setFromRotationMatrix(r);}
+// target chain definitions (names from the Tripo rig)
+const T={root:'tripoRoot',hipL:'tripo0_Left_Limb_0',kneeL:'tripo0_Left_Limb_1',ankL:'tripo0_Left_Limb_2',toeL:'tripo0_Left_Limb_3',
+ hipR:'tripo1_Left_Limb_0',kneeR:'tripo1_Left_Limb_1',ankR:'tripo1_Left_Limb_2',toeR:'tripo1_Left_Limb_3',
+ spine:'tripo0_Right_Limb_0',chest:'tripo0_Right_Limb_1',clavL:'tripo0_Right_Limb_2',shL:'tripo0_Right_Limb_3',elL:'tripo0_Right_Limb_4',wrL:'tripo0_Right_Limb_5',midL:'bone_19',
+ clavR:'tripoSpine_0',shR:'bone_26',elR:'bone_27',wrR:'bone_28',midR:'bone_33',neck:'bone_39',head:'tripoHead_0',headEnd:'tripoHead_1'};
+// [targetBone, targetChild, srcFrom, srcTo]
+const CHAINS=[
+ ['hipL','kneeL','LeftUpLeg','LeftLeg'],['kneeL','ankL','LeftLeg','LeftFoot'],['ankL','toeL','LeftFoot','LeftToeBase'],
+ ['hipR','kneeR','RightUpLeg','RightLeg'],['kneeR','ankR','RightLeg','RightFoot'],['ankR','toeR','RightFoot','RightToeBase'],
+ ['spine','chest','LowerBack','Spine1'],
+ ['clavL','shL','LeftShoulder','LeftArm'],['shL','elL','LeftArm','LeftForeArm'],['elL','wrL','LeftForeArm','LeftHand'],['wrL','midL','LeftHand','LeftHandIndex1'],
+ ['clavR','shR','RightShoulder','RightArm'],['shR','elR','RightArm','RightForeArm'],['elR','wrR','RightForeArm','RightHand'],['wrR','midR','RightHand','RightHandIndex1'],
+ ['neck','head','Neck1','Head']];
+let ORDER=null;
+function boneDepthOrder(){const arr=Object.values(bones);const d=b=>{let k=0,p=b;while(p.parent){k++;p=p.parent;}return k;};return arr.sort((a,b)=>d(a)-d(b));}
+function retarget(st){
+  const A=st.anim;const S=SRC[A.name];if(!S)return;
+  // work in charRoot-local frame
+  const sv={p:charRoot.position.clone(),r:charRoot.rotation.y,s:charRoot.scale.x};
+  charRoot.position.set(0,0,0);charRoot.rotation.set(0,0,0);charRoot.scale.setScalar(1);charRoot.updateMatrixWorld(true);
+  const P0=srcPose(A.name,A.t0??0);const P=srcPose(A.name,A.time);
+  // facing: source right (RightUpLeg-LeftUpLeg) at t0 -> world -X (character right), plus extra yaw
+  const lat0=V(P0.LeftUpLeg,P0.RightUpLeg);lat0.y=0;
+  const yaw=Math.atan2(lat0.z,lat0.x)-Math.atan2(0,-1);
+  const Y=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw+(A.yaw||0));
+  const dir=(a,b)=>V(P[a],P[b]).applyQuaternion(Y);
+  // scale by leg length
+  const legS=P0.LeftUpLeg.distanceTo(P0.LeftLeg)+P0.LeftLeg.distanceTo(P0.LeftFoot);
+  const legT=restPos[T.hipL].distanceTo(restPos[T.kneeL])+restPos[T.kneeL].distanceTo(restPos[T.ankL]);
+  const k=legT/legS;
+  const W={}; // new world quats (charRoot-local)
+  const setW=(key,q)=>{W[T[key]]=q;};
+  // hips orientation
+  const hipC0=restPos[T.hipL].clone().add(restPos[T.hipR]).multiplyScalar(0.5);
+  const up0=V(hipC0,restPos[T.spine]);const la0=V(restPos[T.hipL],restPos[T.hipR]);
+  const sHip=P.LeftUpLeg.clone().add(P.RightUpLeg).multiplyScalar(0.5);
+  const up=dir('Hips','Spine1');const la=dir('LeftUpLeg','RightUpLeg');
+  const Rh=qFrom2(up0,la0,up,la);
+  window._d={up0:up0.toArray(),la0:la0.toArray(),up:up.toArray(),la:la.toArray(),Rh:Rh.toArray(),yaw};
+  setW('root',Rh.clone().multiply(restWorld[T.root]));
+  // chest two-vector
+  const cu0=V(restPos[T.chest],restPos[T.neck]),cl0=V(restPos[T.shL],restPos[T.shR]);
+  const Rc=qFrom2(cu0,cl0,dir('Spine1','Neck1'),dir('LeftArm','RightArm'));
+  // swing chains
+  const swing={};
+  for(const [tb,tc,sa,sb] of CHAINS){
+    const d0=V(restPos[T[tb]],restPos[T[tc]]).normalize();const d1r=dir(sa,sb);if(d1r.length()<1e-6)continue;const d1=d1r.normalize();
+    let q=new THREE.Quaternion().setFromUnitVectors(d0,d1);
+    // keep twist roughly from parent region: for chest-attached chains blend with chest rotation twist
+    swing[tb]=q;
+  }
+  // chest: use full rotation, spine: swing
+  for(const key in swing){ if(key==='chest')continue; setW(key,swing[key].clone().multiply(restWorld[T[key]])); }
+  setW('chest',Rc.clone().multiply(restWorld[T.chest]));
+  // head follows neck swing but keeps chest twist
+  setW('head',null);
+  // compose locals in hierarchy order
+  if(!ORDER)ORDER=boneDepthOrder();
+  const NW={};
+  for(const b of ORDER){
+    const n=b.name;const parentIsBone=b.parent&&b.parent.isBone;
+    const pW=parentIsBone?NW[b.parent.name]:(restWorld[n].clone().multiply(rest[n].clone().invert()));
+    let w=W[n];
+    if(!w){ // keep rest local relative to new parent
+      w=pW.clone().multiply(rest[n]);
+    }
+    NW[n]=w;
+    b.quaternion.copy(pW.clone().invert().multiply(w));
+  }
+  // root position: put hip centre at source hip centre (scaled), optionally lock xz
+  const sh=sHip.clone().sub(P0.LeftUpLeg.clone().add(P0.RightUpLeg).multiplyScalar(0.5)).applyQuaternion(Y).multiplyScalar(k);
+  if(A.lockXZ!==false){sh.x=0;sh.z=0;}
+  const Phip=hipC0.clone().add(sh);
+  const v0=V(restPos[T.root],hipC0);
+  const rootPos=Phip.clone().sub(v0.applyQuaternion(Rh));
+  model.updateMatrixWorld(true);
+  bones[T.root].position.copy(bones[T.root].parent.worldToLocal(rootPos.clone()));
+  // ground: lowest ankle back to rest ankle height
+  if(A.ground!==false){
+    model.updateMatrixWorld(true);
+    const a1=new THREE.Vector3(),a2=new THREE.Vector3(),t1=new THREE.Vector3(),t2=new THREE.Vector3();
+    bones[T.ankL].getWorldPosition(a1);bones[T.ankR].getWorldPosition(a2);bones[T.toeL].getWorldPosition(t1);bones[T.toeR].getWorldPosition(t2);
+    const low=Math.min(a1.y-restPos[T.ankL].y,a2.y-restPos[T.ankR].y,t1.y-restPos[T.toeL].y,t2.y-restPos[T.toeR].y);
+    rootPos.y-=low*(A.ground===true||A.ground===undefined?1:A.ground);
+    bones[T.root].position.copy(bones[T.root].parent.worldToLocal(rootPos.clone()));
+  }
+  charRoot.position.copy(sv.p);charRoot.rotation.y=sv.r;charRoot.scale.setScalar(sv.s);charRoot.updateMatrixWorld(true);
+}
+// extra local offsets on top of current pose (fingers etc.), same convention as applyPose
+function addPose(pose){
+  const mq=model.quaternion.clone();
+  for(const [n,rots] of Object.entries(pose.bones||{})){
+    const b=bones[n];if(!b)continue;let d=new THREE.Quaternion();
+    for(const [ax,ang] of rots){d.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(...ax).normalize(),ang));}
+    const dW=mq.clone().multiply(d).multiply(mq.clone().invert());const rw=restWorld[n];
+    b.quaternion.multiply(rw.clone().invert().multiply(dW).multiply(rw));
+  }
+}
+
+function makeProps(){
+  const red=new THREE.MeshToonMaterial({color:0xff1a3a,gradientMap:gm,emissive:0x550010});
+  const dark=new THREE.MeshToonMaterial({color:0x222226,gradientMap:gm});
+  const steel=new THREE.MeshToonMaterial({color:0x9a9aa6,gradientMap:gm});
+  const mk=(geo,mat)=>new THREE.Mesh(geo,mat);
+  // dumbbell
+  const db=new THREE.Group();const bar=mk(new THREE.CylinderGeometry(0.012,0.012,0.16,16),steel);bar.rotation.z=Math.PI/2;db.add(bar);
+  for(const s of [-1,1]){const p=mk(new THREE.CylinderGeometry(0.045,0.045,0.04,6),dark);p.rotation.z=Math.PI/2;p.position.x=s*0.07;db.add(p);
+    const r=mk(new THREE.TorusGeometry(0.045,0.005,8,6),red);r.userData.glow=true;r.rotation.y=Math.PI/2;r.position.x=s*0.07;db.add(r);}
+  props.dumbbell=db;
+  // barbell
+  const bb=new THREE.Group();const b2=mk(new THREE.CylinderGeometry(0.01,0.01,1.2,16),steel);b2.rotation.z=Math.PI/2;bb.add(b2);
+  for(const s of [-1,1])for(const k of [0,1]){const p=mk(new THREE.CylinderGeometry(0.11-k*0.025,0.11-k*0.025,0.03,24),k?red:dark);p.rotation.z=Math.PI/2;p.position.x=s*(0.45+k*0.035);bb.add(p);}
+  props.barbell=bb;
+  // band
+  const band=mk(new THREE.TorusGeometry(0.12,0.012,10,48),red);props.band=band;
+  // stairs
+  const st=new THREE.Group();for(let i=0;i<8;i++){const s=mk(new THREE.BoxGeometry(0.8,0.1,0.25),dark);s.position.set(0,0.05+i*0.1,-i*0.25);st.add(s);
+    const e=mk(new THREE.BoxGeometry(0.82,0.008,0.008),new THREE.MeshBasicMaterial({color:0xff2040}));e.userData.glow=true;e.position.set(0,0.1+i*0.1,-i*0.25+0.125);st.add(e);}
+  props.stairs=st;
+  // gym machine (simple station)
+  const gymG=new THREE.Group();const fm=dark;
+  for(const x of [-0.4,0.4]){const p=mk(new THREE.BoxGeometry(0.05,1.4,0.05),fm);p.position.set(x,0.7,0);gymG.add(p);}
+  const top=mk(new THREE.BoxGeometry(0.85,0.05,0.05),fm);top.position.y=1.4;gymG.add(top);
+  const stack=mk(new THREE.BoxGeometry(0.3,0.5,0.15),red);stack.position.y=0.3;gymG.add(stack);
+  props.gym=gymG;
+  for(const k in props){props[k].visible=false;scene.add(props[k]);}
+}
+
+const bloomComposer=new EffectComposer(renderer);bloomComposer.renderToScreen=false;
+bloomComposer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(W/2,H/2),1.0,0.35,0.0);bloomComposer.addPass(bloom);
+const mixPass=new ShaderPass(new THREE.ShaderMaterial({uniforms:{baseTexture:{value:null},bloomTexture:{value:bloomComposer.renderTarget2.texture}},
+ vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+ fragmentShader:'uniform sampler2D baseTexture;uniform sampler2D bloomTexture;varying vec2 vUv;void main(){gl_FragColor=texture2D(baseTexture,vUv)+vec4(1.0)*texture2D(bloomTexture,vUv);}'}),'baseTexture');
+mixPass.needsSwap=true;
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));composer.addPass(mixPass);composer.addPass(new OutputPass());
+const blackMat=new THREE.MeshBasicMaterial({color:0x000000});
+function renderAll(){
+  // bloom pass: only emissive things
+  uBloomOnly.value=1;const bg=scene.background;scene.background=new THREE.Color(0);
+  const saved=[];scene.traverse(o=>{if(o.isMesh&&o.userData.glow!==true&&o.userData.glowSkin!==true){saved.push([o,o.material]);o.material=blackMat;}});
+  const fogSave=scene.fog;scene.fog=null;grid.visible=false;parts.visible=false;
+  bloomComposer.render();
+  for(const [o,m] of saved)o.material=m;grid.visible=true;parts.visible=true;scene.background=bg;scene.fog=fogSave;uBloomOnly.value=0;
+  composer.render();
+}
+window.grab=()=>document.getElementById('c').toDataURL('image/jpeg',0.93);
+window.frame=(st)=>{
+  uTime.value=st.t||0;const Lg=st.light||{};hemi.intensity=Lg.hemi??0.42;key.intensity=Lg.key??1.6;rimL.intensity=Lg.rimL??2.2;rimR.intensity=Lg.rimR??1.5;if(Lg.ramp){gm.image.data.set(Lg.ramp.flatMap(v=>[v,v,v,255]));gm.needsUpdate=true;}uOW.value=st.outline??0.0016;uDebug.value=st.debug||0;
+  for(const m of MUSCLES)uM['m_'+m].value=(st.muscles&&st.muscles[m])||0;
+  charRoot.visible=st.char!==false;
+  charRoot.position.set(...(st.charPos||[0,0,0]));
+  charRoot.rotation.y=st.charRotY||0;
+  const sc=st.charScale||1.0;charRoot.scale.setScalar(sc);
+  if(st.clips){applyClips(st);} else if(st.anim){applyPose({});retarget(st);
+    if(st.anim2&&st.mix>0){const qa={},ra=bones[T.root].position.clone();for(const n in bones)qa[n]=bones[n].quaternion.clone();
+      applyPose({});retarget({anim:st.anim2});const k=st.mix;
+      for(const n in bones)bones[n].quaternion.copy(qa[n].clone().slerp(bones[n].quaternion,k));
+      bones[T.root].position.copy(ra.lerp(bones[T.root].position,k));}
+    if(st.pose)addPose(st.pose);} else applyPose(st.pose||{});
+  disc.position.x=charRoot.position.x;disc.position.z=charRoot.position.z;disc.scale.setScalar(st.discScale||1);
+  for(const k in props){const p=st.props&&st.props[k];props[k].visible=!!p;if(p){props[k].position.set(...p.pos);props[k].rotation.set(...(p.rot||[0,0,0]));props[k].scale.setScalar(p.s||1);}}
+  // attach props to hands if requested
+  if(st.handProp){const {name,bone,offset}=st.handProp;const p=props[name];p.visible=true;
+    model.updateMatrixWorld(true);const v=new THREE.Vector3(...(offset||[0,0,0]));bones[bone].localToWorld(v);p.position.copy(v);}
+  const c=st.cam||{pos:[0,1.0,5.2],target:[0,0.9,0],fov:30};
+  camera.position.set(...c.pos);camera.fov=c.fov||30;camera.updateProjectionMatrix();camera.lookAt(...c.target);
+  parts.position.y=-(((st.t||0)*0.15)%1)*0.0;
+  const a=pg.attributes.position.array;for(let i=0;i<N;i++){a[i*3+1]=((pp[i*3+1]+(st.t||0)*0.25)%5);}pg.attributes.position.needsUpdate=true;
+  grid.material.opacity=0.3+0.1*Math.sin((st.t||0)*2.5);
+  bloom.strength=st.bloom??1.0;
+  renderAll();
+  const out={};
+  if(st.project){model.updateMatrixWorld(true);for(const n of st.project){let v=new THREE.Vector3();
+    if(bones[n])bones[n].getWorldPosition(v);else if(props[n])props[n].getWorldPosition(v);else continue;
+    v.project(camera);out[n]=[(v.x+1)/2*W,(1-v.y)/2*H];}}
+  return out;
+};
+window.dbg2=()=>window._d;
+window.dbg=()=>{model.updateMatrixWorld(true);const o={};for(const k of ['tripoRoot','tripo0_Left_Limb_0','tripo0_Left_Limb_1','tripo0_Left_Limb_2','tripo0_Right_Limb_1','tripoHead_0','bone_26']){const v=new THREE.Vector3();bones[k].getWorldPosition(v);o[k]=v.toArray().map(x=>+x.toFixed(3));}return o;};
+window.restDbg=()=>{const o={};for(const k in restPos)o[k]=restPos[k].toArray().map(x=>+x.toFixed(3));return o;};
+window.srcDbg=(n,t)=>{const P=srcPose(n,t);const o={};for(const k of ['Hips','LeftUpLeg','RightUpLeg','LeftFoot','Head','LeftArm','RightArm'])o[k]=P[k].toArray().map(x=>+x.toFixed(2));return o;};
+window.dbgB=()=>{model.updateMatrixWorld(true);const o={};for(const n of ['mixamorigHips','mixamorigLeftFoot','mixamorigHead','mixamorigLeftHand']){const v=new THREE.Vector3();bones[n].getWorldPosition(v);o[n]=v.toArray().map(x=>+x.toFixed(3));}
+ o.hipsLocal=bones['mixamorigHips'].position.toArray();o.armScale=bones['mixamorigHips'].parent.scale.toArray();o.armName=bones['mixamorigHips'].parent.name;o.armRot=bones['mixamorigHips'].parent.quaternion.toArray();
+ const g=skinned.geometry;g.computeBoundingBox();o.bbox=[g.boundingBox.min.toArray(),g.boundingBox.max.toArray()];o.meshParent=skinned.parent.name;o.bindIdent=skinned.bindMatrix.elements.slice(12,15);return o;};
+window.boneWorld=(n)=>{model.updateMatrixWorld(true);const v=new THREE.Vector3();bones[n].getWorldPosition(v);return v.toArray();};
+window.ready=true;
+</script></body></html>

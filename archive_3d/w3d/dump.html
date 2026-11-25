@@ -1,0 +1,12 @@
+<html><body><canvas id=c width=800 height=800></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+new GLTFLoader().load('hero.glb',g=>{
+  const out=[];g.scene.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(g.scene);out.push('box '+JSON.stringify(box));
+  g.scene.traverse(o=>{if(o.isBone){const p=new THREE.Vector3();o.getWorldPosition(p);out.push(`${o.name} parent=${o.parent.name} pos=${p.x.toFixed(3)},${p.y.toFixed(3)},${p.z.toFixed(3)} rot=${o.quaternion.toArray().map(v=>v.toFixed(2))}`)}});
+  window.dump=out.join('\n');
+},undefined,e=>{window.dump='ERR '+e});
+</script></body></html>
