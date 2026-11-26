@@ -1,4 +1,4 @@
-# QA report: b5:05_leg_day  (227.3 s)
+# QA report: b5:05_leg_day  (268.1 s)
 
 ## 1a. Text over character — 0
 - none
@@ -19,20 +19,21 @@
 - none
 
 ## 2b. Sprite jitter: contact point slides between phases — 8
-- wifi: Δx 89px Δy 15px (used at [3.5, 9.8, 14.9, 56.7, 215.4])
-- heavysquat: Δx 43px Δy 5px (used at [31.1, 108.5, 191.1])
-- lazy: Δx 224px Δy 16px (used at [44.8, 149.9, 174.9])
-- walk: Δx 109px Δy 11px (used at [50.0])
-- calfjj: Δx 108px Δy 5px (used at [78.9, 137.3])
-- lunge: Δx 155px Δy 21px (used at [85.3])
-- rdl: Δx 37px Δy 5px (used at [122.8])
-- sore: Δx 47px Δy 22px (used at [165.2])
+- wifi: Δx 92px Δy 16px (used at [3.8, 11.1, 17.0, 66.4, 255.0])
+- heavysquat: Δx 43px Δy 5px (used at [36.7, 127.5, 226.1])
+- lazy: Δx 224px Δy 16px (used at [53.1, 178.5, 208.8])
+- walk: Δx 109px Δy 11px (used at [59.0])
+- calfjj: Δx 121px Δy 4px (used at [94.1, 163.3])
+- lunge: Δx 155px Δy 21px (used at [101.3])
+- rdl: Δx 37px Δy 5px (used at [144.8])
+- sore: Δx 47px Δy 22px (used at [196.2])
 
 ## 3a. Spans with no new visual event > 4.5 s — 2
-- 92.7–97.7s (5.1s)
-- 160.3–165.2s (4.9s)
+- 109.7–115.4s (5.7s)
+- 190.5–196.2s (5.7s)
 
-## 3b. Same pose on screen > 12 s — 1
-- wifi: 3.5–17.7s (14.2s)
+## 3b. Same pose on screen > 12 s — 2
+- wifi: 3.8–20.2s (16.4s)
+- fingers: 182.8–196.2s (13.4s)
 
 ## Contact sheets for manual review

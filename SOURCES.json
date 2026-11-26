@@ -40,7 +40,12 @@
    "model": "eleven_turbo_v2_5",
    "credits": 26,
    "note": "пробы, в ролики не пошли; испанский сделан бесплатно Piper"
-  }
+  },
+  "05_leg_day": "9ZbU8DvNYZ",
+  "06_dead_hang": "iGkJmHv3uK",
+  "07_calisthenics_vs_gym": "lJhK0Gdgv9",
+  "08_pushup_ladder": "s7m5WbGl8e",
+  "09_morning_routine": "TdJAbAsVNR"
  },
  "sheets": {
   "pullup": "xSBpPWqjfW",
@@ -137,5 +142,60 @@
    "bg_lab": "79frObUJAL",
    "bg_elevator": "6AbU3UEiJO"
   }
+ },
+ "covers_en": {
+  "_note": "Magnific Relax (0 credits), Nano Banana 2.1, 16:9, text added by covers/covers_en.py. ref = RU original thumbnail uploaded to Magnific.",
+  "01": {
+   "art": "aFnBa9BfSh",
+   "ref": "fHYovFMCDY",
+   "yt_ref": "tiqXSLtIDfc"
+  },
+  "02": {
+   "art": "MByzMYMDCm",
+   "ref": "1lBQKlBr4r",
+   "yt_ref": "5enhtB1_1o4"
+  },
+  "03": {
+   "art": "9ZbwZPvNYZ",
+   "art_v1_nomask": "WDUZVCRcXe"
+  },
+  "04": {
+   "art": "dtN0B11XSL",
+   "ref": "jUIqrw3LD0",
+   "yt_ref": "l9mMPWbmBlk"
+  },
+  "05": {
+   "art": "IfZD81jtvE",
+   "ref": "bxpfHjQ5Y2",
+   "yt_ref": "NjHb_Uk1nJ0"
+  },
+  "06": {
+   "art": "jUIbsQSLD0",
+   "ref": "p84YMtgehw",
+   "yt_ref": "f1-AKpt3BmQ"
+  },
+  "07": {
+   "art": "gOv1wRVSXO",
+   "ref": "KLdEbg3kqp",
+   "yt_ref": "IdG5C1Hi0B8"
+  },
+  "08": {
+   "art": "s7mKShel8e",
+   "ref": "8aRMBuUIrU",
+   "yt_ref": "-FlrtN_Ekxc"
+  },
+  "09": {
+   "art": "ksXQjLK16B",
+   "ref": "Xm60eCaBfo",
+   "yt_ref": "cwl9BQRNDVg"
+  }
+ },
+ "channel_neonfit": {
+  "channel_id": "UCqIsrFnUnBLfOkn9w1KkdcA",
+  "handle": "@neonfitanime",
+  "banner_art": "jUIqdHYLD0",
+  "banner": "9ZbUqEfNYZ",
+  "avatar": "BhiTihhoQR",
+  "watermark": "ov3V3v9829"
  }
 }
