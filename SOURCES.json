@@ -195,14 +195,15 @@
   "handle": "@neonfitanime",
   "banner_art": "jUIqdHYLD0",
   "banner": "ksXF5pe16B",
-  "avatar": "UPfjgviwny",
+  "avatar": "VXOYdQTMMU",
   "watermark": "ov3V3v9829",
   "banner_v1": "9ZbUqEfNYZ",
   "avatar_v1": "BhiTihhoQR",
-  "_v2": "banner: SC=0.56 FY=338 python3 covers/banner_neonfit.py covers/banner_neonfit_art.png (hero to abs inside desktop band); avatar: square crop of banner art x1376 y300 S960"
+  "_v2": "banner: SC=0.56 FY=338 python3 covers/banner_neonfit.py covers/banner_neonfit_art.png (hero to abs inside desktop band); avatar: square crop of banner art x1376 y300 S960",
+  "_avatar_v3": "crop of covers/neonfit_avatar_800.png x70 y15 S660 (more portrait); v2 (from banner art) rejected by author"
  },
  "youtube_neonfit": {
-  "_note": "scheduled 2026-11-27 17:00 America/New_York, audio tracks ES/FR/AR added",
+  "_note": "17:00 America/New_York, every other day; audio tracks ES/FR/AR on all",
   "01": "B96a_IUw_xo",
   "02": "U5v8wYEkQhQ",
   "03": "8ULR_QbgWKo",
@@ -211,6 +212,17 @@
   "06": "Y3pRlf5wlkI",
   "07": "WiahVUhCG-4",
   "08": "USaK7K4InI8",
-  "09": "ivYb_5Bal1k"
+  "09": "ivYb_5Bal1k",
+  "schedule": {
+   "07": "2026-11-27",
+   "02": "2026-11-29",
+   "04": "2026-12-01",
+   "05": "2026-12-03",
+   "06": "2026-12-05",
+   "01": "2026-12-07",
+   "08": "2026-12-09",
+   "09": "2026-12-11",
+   "03": "2026-12-13"
+  }
  }
 }
