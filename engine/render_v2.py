@@ -566,7 +566,8 @@ def render(fi):
                 fr.alpha_composite(img.crop((0, 0, max(1, w), HT)), (0, 0))
                 ImageDraw.Draw(fr).rectangle([w - 8, 0, w + 8, HT], fill=RED + (255,))
             else:
-                z = 1 + 0.03 * (a / 1.5)
+                # slow push-in that settles at +4% and HOLDS (no unbounded growth -> no snap-back at the next scene)
+                kz = min(1.0, a / 6.0); z = 1 + 0.04 * kz * kz * (3 - 2 * kz)
                 im2 = img.resize((int(WD * z), int(HT * z)), Image.BILINEAR)
                 fr.alpha_composite(im2, (-(im2.width - WD) // 2, -(im2.height - HT) // 2))
             fr.alpha_composite(GLOW)

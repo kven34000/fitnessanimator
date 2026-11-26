@@ -15,7 +15,7 @@ SPRDIR = R.SPRDIR
 
 # ---------------- new sheets ----------------
 # name: (rows, cols, scale-mode, target)
-NEW = dict(kneepush=(4, 2, 'w', 1000), inclinepush=(4, 2, 'w', 1050), birddog=(4, 2, 'w', 950), superman=(4, 2, 'w', 1050), bridge=(4, 2, 'w', 1000), goodmorning=(2, 4, 'h', 760), calfjj=(2, 4, 'h', 770), lunge=(2, 4, 'h', 760), wifi=(2, 4, 'h', 800), hang=(2, 4, 'h', 900), grip=(2, 4, 'h', 780), morning=(2, 4, 'h', 780), crawl=(4, 2, 'w', 1000), walk=(2, 4, 'h', 760), walkphone=(2, 4, 'h', 760), rails=(2, 4, 'h', 740), cookie=(2, 4, 'h', 780), fateat=(2, 4, 'h', 780), tape=(2, 4, 'h', 780), tanker=(2, 4, 'h', 760), mailman=(2, 4, 'h', 800), caveman=(2, 4, 'h', 780), situp=(4, 4, 'w', 900), plank=(4, 2, 'w', 1050), sore=(2, 4, 'h', 780), hair=(2, 4, 'h', 780), hero=(2, 4, 'h', 800), legraise=(1, 1, 'w', 1000), tablerow=(4, 2, 'h', 620), pullup=(2, 4, 'h', 760), dips=(2, 4, 'h', 760), decline=(4, 2, 'w', 1050), pushup=(4, 2, 'w', 1050),
+NEW = dict(inclineB=(1, 1, 'w', 1580), kneepush=(4, 2, 'w', 1000), inclinepush=(4, 2, 'w', 1050), birddog=(4, 2, 'w', 950), superman=(4, 2, 'w', 1050), bridge=(4, 2, 'w', 1000), goodmorning=(2, 4, 'h', 760), calfjj=(2, 4, 'h', 770), lunge=(2, 4, 'h', 760), wifi=(2, 4, 'h', 800), hang=(2, 4, 'h', 900), grip=(2, 4, 'h', 780), morning=(2, 4, 'h', 780), crawl=(4, 2, 'w', 1000), walk=(2, 4, 'h', 760), walkphone=(2, 4, 'h', 760), rails=(2, 4, 'h', 740), cookie=(2, 4, 'h', 780), fateat=(2, 4, 'h', 780), tape=(2, 4, 'h', 780), tanker=(2, 4, 'h', 760), mailman=(2, 4, 'h', 800), caveman=(2, 4, 'h', 780), situp=(4, 4, 'w', 900), plank=(4, 2, 'w', 1050), sore=(2, 4, 'h', 780), hair=(2, 4, 'h', 780), hero=(2, 4, 'h', 800), legraise=(1, 1, 'w', 1000), tablerow=(4, 2, 'h', 620), pullup=(2, 4, 'h', 760), dips=(2, 4, 'h', 760), decline=(4, 2, 'w', 1050), pushup=(4, 2, 'w', 1050),
            bulgarian=(2, 4, 'h', 740), rdl=(2, 4, 'h', 740), benchdip=(2, 4, 'h', 700), pain=(2, 4, 'h', 760),
            row=(2, 2, 'w', 1000), fatrobe=(2, 4, 'h', 760), fatbar=(2, 4, 'h', 820), lab=(2, 4, 'h', 780),
            wheel=(2, 4, 'h', 640), heavysquat=(2, 4, 'h', 760), latpull=(2, 4, 'h', 820), shoulder=(2, 4, 'h', 770),
@@ -24,9 +24,9 @@ NEW = dict(kneepush=(4, 2, 'w', 1000), inclinepush=(4, 2, 'w', 1050), birddog=(4
            rowbar=(2, 4, 'h', 820), sidepull=(2, 4, 'h', 880), benchpress=(2, 4, 'w', 900), facepalm=(2, 4, 'h', 780),
            tools=(2, 4, 'h', 780), stretch=(2, 4, 'h', 820), thumbs2=(2, 4, 'h', 780), dumbbell=(2, 4, 'h', 780))
 STATIC_SCALE = dict(pullup=0.95, fatbar=0.9)
-SHEETDIM = dict(row=(2400, 880))
+SHEETDIM = dict(row=(2400, 880), inclineB=(1840, 1088))
 SHEET_W, SHEET_H = 2400, 1792
-PERIOD = dict(kneepush=1.8, inclinepush=1.8, birddog=4.0, superman=4.0, bridge=2.4, goodmorning=3.0, calfjj=2.4, lunge=2.6, wifi=4.0, hang=4.0, grip=4.0, morning=4.0, walk=1.15, walkphone=1.3, rails=1.4, cookie=4.0, fateat=4.0, tape=4.0, tanker=4.0, mailman=4.0, caveman=4.0, crawl=3.0, situp=2.4, plank=4.0, sore=4.0, hair=4.0, hero=4.0, legraise=3.0, tablerow=3.6, rowbar=2.4, sidepull=4.0, benchpress=3.0, facepalm=3.2, tools=4.0, stretch=4.0, thumbs2=3.2, dumbbell=2.6, fatrobe=4.0, fatbar=3.2, lab=4.0, wheel=4.0, heavysquat=2.6, latpull=2.4, shoulder=3.6, fingers=4.0, stop=3.2, pray=4.0, tired=3.2, notepad=4.0, lazy=4.0, weightdip=3.2, pullup=2.4, dips=3.2, decline=3.0, pushup=1.6, bulgarian=2.4, rdl=2.8, benchdip=1.8, pain=3.2, row=2.0)
+PERIOD = dict(inclineB=1.8, kneepush=1.8, inclinepush=1.8, birddog=4.0, superman=4.0, bridge=2.4, goodmorning=3.0, calfjj=2.4, lunge=2.6, wifi=4.0, hang=4.0, grip=4.0, morning=4.0, walk=1.15, walkphone=1.3, rails=1.4, cookie=4.0, fateat=4.0, tape=4.0, tanker=4.0, mailman=4.0, caveman=4.0, crawl=3.0, situp=2.4, plank=4.0, sore=4.0, hair=4.0, hero=4.0, legraise=3.0, tablerow=3.6, rowbar=2.4, sidepull=4.0, benchpress=3.0, facepalm=3.2, tools=4.0, stretch=4.0, thumbs2=3.2, dumbbell=2.6, fatrobe=4.0, fatbar=3.2, lab=4.0, wheel=4.0, heavysquat=2.6, latpull=2.4, shoulder=3.6, fingers=4.0, stop=3.2, pray=4.0, tired=3.2, notepad=4.0, lazy=4.0, weightdip=3.2, pullup=2.4, dips=3.2, decline=3.0, pushup=1.6, bulgarian=2.4, rdl=2.8, benchdip=1.8, pain=3.2, row=2.0)
 
 _orig_load = R.load_sprites
 def load_sprites():
@@ -75,6 +75,8 @@ def load_sprites():
         R.SPR[nm] = frs[0][:3]
 R.load_sprites = load_sprites
 
+# phase order for sheets whose 8 cells are not one clean loop (pushup: cells 4-6 face the other way)
+CYCLE = dict(pushup=[0, 1, 2, 3, 3, 2, 1, 0], birddog=[0, 2, 4, 6, 6, 6, 4, 2], inclineB=[0, 1, 2, 3, 3, 2, 1, 0])
 REG = dict(hang='top', pullup='top', fatbar='top', sidepull='bottom', latpull='all', rowbar='bottom', row='bottom')
 def register(nm, frs, q=4):
     # align every frame to frame 0 by correlating a stable band (feet/equipment) of the alpha masks
@@ -122,6 +124,8 @@ def frame_for(pose, a, e):
         return frs[int(round(float(np.interp(a2, [k[0] for k in ks], [k[1] for k in ks])))) % len(frs)]
     if pose in NEW:
         frs = R.ANIM[pose]; P = e.get('period') or PERIOD[pose]
+        seq = CYCLE.get(pose)
+        if seq: return frs[seq[int((a % P) / P * len(seq)) % len(seq)]]
         return frs[int((a % P) / P * len(frs)) % len(frs)]
     return _orig_ff(pose, a, e)
 R.frame_for = frame_for
@@ -376,6 +380,15 @@ R.init = init2
 exec(open('/home/claude/fitnessanimator/videos/_batch5/tl_head.py').read())
 exec(open(f'{VD}/timeline.py').read())
 exec(open('/home/claude/fitnessanimator/videos/_batch5/tl_tail.py').read())
+# merge back-to-back loc() blocks of the same background: one continuous shot (no wipe, no zoom reset)
+_locs = sorted([e for e in R.EL if e['k'] == 'loc'], key=lambda e: e['t0'])
+_drop = set()
+for i in range(1, len(_locs)):
+    p_, c_ = _locs[i - 1], _locs[i]
+    if id(p_) in _drop: continue
+    if c_['seq'][-1][1] == p_['seq'][-1][1] and abs(c_['t0'] - p_['t1']) < 0.08 and len(c_['seq']) == 1:
+        p_['t1'] = max(p_['t1'], c_['t1']); _drop.add(id(c_)); _locs[i] = p_
+R.EL[:] = [e for e in R.EL if id(e) not in _drop]
 
 # ---------------- subtitles (estimated word timing until the voice is recorded) ----------------
 def build_subs(segs, dur):

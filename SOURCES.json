@@ -97,7 +97,7 @@
   "goodmorning": "rgo8vnVxtc",
   "bridge": "KLdXtsikqp",
   "superman": "ov3RGno829",
-  "birddog": "P3HqkIF42C",
+  "birddog": "SyaKHuhUb8",
   "inclinepush": "0e7JPxaTfW",
   "kneepush": "jUIth1PLD0",
   "lunge_mus": "WDU7TZtcXe",
@@ -106,7 +106,9 @@
   "hang_mus": "vQznvAVa47",
   "calfjj_mus": "3z1r3zoREY",
   "goodmorning_mus": "UPfCgSnwny",
-  "bridge_mus": "gOvaLMXSXO"
+  "bridge_mus": "gOvaLMXSXO",
+  "birddog_v1": "P3HqkIF42C",
+  "birddog_mus": "9ZbglUHNYZ"
  },
  "_missing": "ID остальных листов (базовые позы, fatrobe, lab, wheel, heavysquat, latpull, shoulder, fingers, stop, pray, tired, notepad, lazy, facepalm, tools, stretch, thumbs2, dumbbell, rdl, pain, row, pushup) не записаны; PNG лежат в sprites2d/sheets.",
  "04_walking_belly_fat": {

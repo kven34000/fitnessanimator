@@ -61,7 +61,7 @@ chip('TO FAILURE', w(11, 0.75), S[12], 1350, 250, 'dimx', 52); PUNCH.append(w(11
 ex('pushup', S[12], S[13], x=960, y=900, period=1.4)
 chip('STEP 2: REGULAR', S[12], S[13], 80, 200, 'on', 54)
 chip('FAILURE AGAIN', w(12, 0.55), S[13], 1350, 250, 'dimx', 52)
-ex('inclinepush', S[13], S[14], x=900, y=900, period=1.6)
+ex('inclineB', S[13], S[14], x=900, y=900, period=1.6)
 chip('STEP 3: INCLINE', S[13], S[14], 80, 200, 'on', 54)
 chip('HANDS ON A BENCH', w(13, 0.3), S[14], 80, 310, 'n', 44)
 chip('TO FAILURE', w(13, 0.7), S[14], 1350, 250, 'dimx', 52)
@@ -93,8 +93,8 @@ card(w(18, 0.05), S[19], 1400, 360, ['THE PLAN', 'PUSH-UPS / PULLS', 'SQUATS / H
 chip('FOR 1 MONTH', w(18, 0.6), S[19], 1400, 720, 'on', 56, anchor='c')
 loc(S[19], S[20], 'calipark')
 ex('thumbs2', S[19], S[20], x=420, sc=0.9)
-for j, (nm, x_, lab) in enumerate((('handstand', 900, 'HANDSTAND'), ('lsit', 1270, 'L-SIT'), ('planche', 1650, 'PLANCHE'))):
-    img(nm, w(19, 0.4 + 0.15 * j), S[20], x_, 560, 420 if nm == 'handstand' else 300)
+for j, (nm, x_, lab) in enumerate((('handstand', 860, 'HANDSTAND'), ('lsit', 1210, 'L-SIT'), ('planche', 1580, 'PLANCHE'))):
+    img(nm, w(19, 0.4 + 0.15 * j), S[20], x_, 560, {'handstand': 420, 'lsit': 280, 'planche': 220}[nm])
     chip(lab, w(19, 0.4 + 0.15 * j), S[20], x_, 830, 'on', 44, anchor='c')
 chip('REAL PROGRESS', w(19, 0.05), w(19, 0.4), 1250, 300, 'check', 54, anchor='c')
 
