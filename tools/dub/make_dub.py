@@ -60,7 +60,7 @@ def synth(text, L):
 def atempo(x, f):
     p = subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', '-filter:a', f'atempo={f:.4f}', '-f', 'f32le', '-'], input=x.tobytes(), capture_output=True)
     return np.frombuffer(p.stdout, np.float32)
-buf = np.zeros(int(total * SR) + SR, np.float32); log = []; cur = 0.0
+buf = np.zeros(int(total * SR) + 20 * SR, np.float32); log = []; cur = 0.0
 for i, (s0, s1) in enumerate(seg):
     nxt = seg[i + 1][0] if i + 1 < len(seg) else total - 0.3
     tgt = s1 - s0; room = max(tgt, nxt - s0 - 0.12)
@@ -71,7 +71,9 @@ for i, (s0, s1) in enumerate(seg):
     t0 = max(s0, cur + 0.08); cur = t0 + d
     p = int(t0 * SR); x = x[:max(0, len(buf) - p)]; buf[p:p + len(x)] += x
     log.append((i, round(s0, 2), round(tgt, 2), round(room, 2), round(d, 2), round(L, 2)))
-buf = buf[:int(round(total * SR))]
+if cur > total - 0.25:
+    buf = atempo(buf[:int(cur * SR) + SR], cur / (total - 0.3)); print('global atempo', round(cur / (total - 0.3), 3))
+buf = np.concatenate([buf, np.zeros(int(total * SR), np.float32)])[:int(round(total * SR))]
 buf = buf / max(1e-6, np.abs(buf).max()) * 0.9
 with wave.open(out, 'wb') as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((buf * 32767).astype(np.int16).tobytes())
