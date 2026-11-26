@@ -11,6 +11,35 @@
    "model": "eleven_v4",
    "stability": 0.3,
    "credits": 1038
+  },
+  "saitama_en": {
+   "creation": "huG4P23vqL",
+   "voice_id": 1472,
+   "voice": "Alistair Ashford",
+   "model": "eleven_v4",
+   "stability": 0.3,
+   "credits": 508
+  },
+  "walking_en": {
+   "creation": "1lBcWhzr4r",
+   "voice_id": 1472,
+   "voice": "Alistair Ashford",
+   "model": "eleven_v4",
+   "stability": 0.3,
+   "credits": 952
+  },
+  "es_samples": {
+   "creations": [
+    "ksXWnXh16B",
+    "tC2yJAsmZJ"
+   ],
+   "voices": [
+    "Emilio Salcedo 1280",
+    "Andrés Bustamante 968"
+   ],
+   "model": "eleven_turbo_v2_5",
+   "credits": 26,
+   "note": "пробы, в ролики не пошли; испанский сделан бесплатно Piper"
   }
  },
  "sheets": {

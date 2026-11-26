@@ -1,13 +1,13 @@
-# QA report: sai  (188.5 s)
+# QA report: sai  (170.2 s)
 
 ## 1a. Text over character — 0
 - none
 
-## 1b. Text over text — 0
-- none
+## 1b. Text over text — 1
+- 60.00–60.25s  «SIT-UPS» × «10 KM»
 
 ## 1c. Text outside the frame — 1
-- 25.50–25.50s  «WHICH ONE IS USELESS?»
+- 23.00–23.00s  «WHICH ONE IS USELESS?»
 
 ## 1d. Subtitle position changes — 0
 - none
@@ -19,22 +19,20 @@
 - none
 
 ## 2b. Sprite jitter: contact point slides between phases — 8
-- hero: Δx 96px Δy 14px (used at [7.2, 173.8])
-- pushup: Δx 228px Δy 31px (used at [40.8, 44.7, 50.7, 80.8, 115.1])
-- situp: Δx 305px Δy 58px (used at [62.7, 97.1, 104.2])
-- sore: Δx 47px Δy 22px (used at [65.3, 67.3])
-- lab: Δx 31px Δy 8px (used at [120.8])
-- decline: Δx 442px Δy 25px (used at [147.8])
-- plank: Δx 73px Δy 9px (used at [154.4])
-- legraise: Δx 35px Δy 0px (used at [157.6])
+- heroC: Δx 100px Δy 18px (used at [8.8, 157.3])
+- pushup: Δx 228px Δy 31px (used at [37.5, 41.3, 47.8, 75.9, 104.4])
+- situp: Δx 305px Δy 58px (used at [58.2, 90.7, 96.2])
+- sore: Δx 47px Δy 22px (used at [61.4, 63.8])
+- lab: Δx 31px Δy 8px (used at [109.4])
+- decline: Δx 442px Δy 25px (used at [134.3])
+- plank: Δx 73px Δy 9px (used at [140.9])
+- legraise: Δx 35px Δy 0px (used at [143.5])
 
-## 3a. Spans with no new visual event > 4.5 s — 3
-- 7.5–13.1s (5.5s)
-- 178.2–183.3s (5.1s)
-- 183.8–188.5s (4.7s)
+## 3a. Spans with no new visual event > 4.5 s — 1
+- 165.1–170.2s (5.1s)
 
 ## 3b. Same pose on screen > 12 s — 1
-- pushup: 40.8–57.4s (16.6s)
+- pushup: 37.5–54.2s (16.7s)
 
 ## Contact sheets for manual review
 - /home/claude/qa/sai/sheet_00.png

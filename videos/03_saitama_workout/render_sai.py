@@ -14,7 +14,7 @@ SPRDIR = R.SPRDIR
 
 # ---------------- new sheets ----------------
 # name: (rows, cols, scale-mode, target)
-NEW = dict(situp=(4, 4, 'w', 900), plank=(4, 2, 'w', 1050), sore=(2, 4, 'h', 780), hair=(2, 4, 'h', 780), hero=(2, 4, 'h', 800), legraise=(1, 1, 'w', 1000), tablerow=(4, 2, 'h', 620), pullup=(2, 4, 'h', 760), dips=(2, 4, 'h', 760), decline=(4, 2, 'w', 1050), pushup=(4, 2, 'w', 1050),
+NEW = dict(situp=(4, 4, 'w', 900), plank=(4, 2, 'w', 1050), sore=(2, 4, 'h', 780), hair=(2, 4, 'h', 780), hero=(2, 4, 'h', 800), heroC=(2, 4, 'h', 800), legraise=(1, 1, 'w', 1000), tablerow=(4, 2, 'h', 620), pullup=(2, 4, 'h', 760), dips=(2, 4, 'h', 760), decline=(4, 2, 'w', 1050), pushup=(4, 2, 'w', 1050),
            bulgarian=(2, 4, 'h', 740), rdl=(2, 4, 'h', 740), benchdip=(2, 4, 'h', 700), pain=(2, 4, 'h', 760),
            row=(2, 2, 'w', 1000), fatrobe=(2, 4, 'h', 760), fatbar=(2, 4, 'h', 820), lab=(2, 4, 'h', 780),
            wheel=(2, 4, 'h', 640), heavysquat=(2, 4, 'h', 760), latpull=(2, 4, 'h', 820), shoulder=(2, 4, 'h', 770),
@@ -25,7 +25,7 @@ NEW = dict(situp=(4, 4, 'w', 900), plank=(4, 2, 'w', 1050), sore=(2, 4, 'h', 780
 STATIC_SCALE = dict(pullup=0.95, fatbar=0.9)
 SHEETDIM = dict(row=(2400, 880))
 SHEET_W, SHEET_H = 2400, 1792
-PERIOD = dict(situp=2.4, plank=4.0, sore=4.0, hair=4.0, hero=4.0, legraise=3.0, tablerow=3.6, rowbar=2.4, sidepull=4.0, benchpress=3.0, facepalm=3.2, tools=4.0, stretch=4.0, thumbs2=3.2, dumbbell=2.6, fatrobe=4.0, fatbar=3.2, lab=4.0, wheel=4.0, heavysquat=2.6, latpull=2.4, shoulder=3.6, fingers=4.0, stop=3.2, pray=4.0, tired=3.2, notepad=4.0, lazy=4.0, weightdip=3.2, pullup=2.4, dips=3.2, decline=3.0, pushup=1.6, bulgarian=2.4, rdl=2.8, benchdip=1.8, pain=3.2, row=2.0)
+PERIOD = dict(heroC=8.0, situp=2.4, plank=4.0, sore=4.0, hair=4.0, hero=4.0, legraise=3.0, tablerow=3.6, rowbar=2.4, sidepull=4.0, benchpress=3.0, facepalm=3.2, tools=4.0, stretch=4.0, thumbs2=3.2, dumbbell=2.6, fatrobe=4.0, fatbar=3.2, lab=4.0, wheel=4.0, heavysquat=2.6, latpull=2.4, shoulder=3.6, fingers=4.0, stop=3.2, pray=4.0, tired=3.2, notepad=4.0, lazy=4.0, weightdip=3.2, pullup=2.4, dips=3.2, decline=3.0, pushup=1.6, bulgarian=2.4, rdl=2.8, benchdip=1.8, pain=3.2, row=2.0)
 
 _orig_load = R.load_sprites
 def load_sprites():

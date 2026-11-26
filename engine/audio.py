@@ -29,8 +29,10 @@ elif LANG == 'en':
 else:
     TM = lambda t: t; VO = '/home/claude/work/vo.mp3'; OUT = '/home/claude/work/mix.wav'
 
+if os.environ.get('VO_OVERRIDE'): VO = os.environ['VO_OVERRIDE']
+if os.environ.get('OUT_OVERRIDE'): OUT = os.environ['OUT_OVERRIDE']
 SR = 44100
-DUR = R.DUR
+DUR = float(os.environ.get('DUR_OVERRIDE', 0)) or R.DUR
 N = int(DUR * SR)
 rng = np.random.default_rng(3)
 

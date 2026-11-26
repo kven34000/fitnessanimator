@@ -45,7 +45,7 @@ for j, (txt, f) in enumerate((('100 PUSH-UPS', 0.0), ('100 SIT-UPS', 0.25), ('10
     chip(txt, w(0, f), S[2], RC, 260 + j * 105, 'on', 56)
 big('EVERY DAY', w(1, 0.05), S[2], x=1450, y=760, size=110); PUNCH.append(w(1, 0.05)); R.SHAKES.append((w(1, 0.05), 0.3))
 fx('loc', S[2], S[4], seq=[(S[2], 'roof')])
-ex('hero', S[2], w(3, 0.55), x=960, sc=0.9, frames=[0, 5, 2], enter='fade')   # original hero look (replaceable shot)
+ex('heroC', S[2], w(3, 0.55), x=960, sc=0.9, frames=[5, 0, 3, 2], enter='fade')   # original hero look (replaceable shot)
 title('THE MOST FAMOUS ANIME WORKOUT', w(2, 0.1), S[3], y=110, size=62)
 chip('STRONGEST MAN ALIVE', w(3, 0.3), w(3, 0.55), RC + 100, 330, 'check', 46)
 ex('hair', w(3, 0.55), S[4], x=960, frames=[0, 1])
@@ -184,7 +184,7 @@ chip('30–40 MIN CARDIO', w(38, 0.45), S[39], RC, 480, 'check', 52)
 
 # ---------- ending ----------
 fx('loc', S[39], DUR, seq=[(S[39], 'roof')])
-ex('hero', S[39], S[40], x=960, frames=[4], enter='fade')
+ex('heroC', S[39], S[40], x=960, frames=[4], enter='fade')
 chip('STRONGEST HERO', w(39, 0.2), S[40], RC, 380, 'strike', 50)
 ex('flex', S[40], S[41], x=960, glow=[(0, w(40, 0.4)), (1, w(40, 0.4)), (2, w(40, 0.4)), (3, w(40, 0.4))]); PUNCH.append(w(40, 0.4))
 title('STRONGER THAN YESTERDAY', w(40, 0.1), S[41], y=130, size=74)
