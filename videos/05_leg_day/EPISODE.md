@@ -1,0 +1,8 @@
+# 05 · Why Leg Day Changes Everything (EN)
+
+- Референс: youtube.com/watch?v=NjHb_Uk1nJ0 («Почему Тренировка Ног Меняет Всё (Разбор По Шагам)», 6:57, 546 тыс., @fitnessanimator). Взят в пакете «следующие 5 самых просматриваемых» (2026-11-26).
+- Разбор: расшифровка + лист кадров (36 кадров) во встроенном браузере; сцены повторяют приёмы оригинала (смена позы на каждую фразу, предметы, двойники, карточки, календари, счётчики), герой @neonfit.
+- Статус: черновик 1 с **бесплатным** голосом Piper (en_US-ryan-high) — только для просмотра. После одобрения автора — платная озвучка Magnific (Alistair Ashford) с согласованием суммы, затем `vo/words.json` заново и перерендер.
+- Черновик: `~/Documents/Clode/Fitness Animator/Review/05 · Why Leg Day Changes Everything draft1.mp4`.
+- Расход Magnific: 0 (все листы, маски, фоны — Relax).
+- Код: `script_en.py` (сценарий), `timeline.py` (сцены), общий движок `videos/_batch5/render_b5.py` (+ `tl_head.py`, `tl_tail.py`, `vo_align5.py`).

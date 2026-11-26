@@ -9,10 +9,18 @@ import sys, os, re, json, math
 import numpy as np
 from PIL import Image, ImageDraw
 name = sys.argv[1]
-OUT = f'/home/claude/qa/{name}'; os.makedirs(OUT, exist_ok=True)
+OUT = f'/home/claude/qa/{name.replace(":", "_")}'; os.makedirs(OUT, exist_ok=True)
 STEP = 0.25
 
-if name in ('six', 'sai', 'walk'):
+if name.startswith('b5:'):
+    os.environ['VDIR'] = '/home/claude/fitnessanimator/videos/' + name[3:]
+    sys.path.insert(0, '/home/claude/fitnessanimator/videos/_batch5'); _a = sys.argv; sys.argv = ['x']; import render_b5 as X; sys.argv = _a
+    R = X.R
+    DUR = X.DUR; to_eng = lambda T: T; to_out = lambda t: t
+    WORDS = []
+    for sw in R.SUBS:
+        WORDS += [(w, a, b) for (w, a, b) in sw[2]]
+elif name in ('six', 'sai', 'walk'):
     if name == 'six': sys.path.insert(0, '/home/claude/v2_6ex'); import render_6ex as X
     elif name == 'walk':
         sys.path.insert(0, '/home/claude/fitnessanimator/videos/04_walking_belly_fat'); _a = sys.argv; sys.argv = ['x']; import render_walk as X; sys.argv = _a
@@ -136,7 +144,7 @@ for e in chars:
 if run and run[2] - run[1] > 12: issues['pose_run'].append((run[0], round(run[1], 1), round(run[2], 1)))
 
 # ---------- contact sheets for the visual review (one frame shortly after each visual event) ----------
-shots = sorted(set(round(min(DUR - 0.1, x + 0.45), 2) for x in ev[:-1]))
+shots = [] if os.environ.get('NOSHEETS') else sorted(set(round(min(DUR - 0.1, x + 0.45), 2) for x in ev[:-1]))
 per = 20; sheets = []
 for si in range(0, len(shots), per):
     im = Image.new('RGB', (4 * 480, 5 * 290), (0, 0, 0)); d = ImageDraw.Draw(im)
