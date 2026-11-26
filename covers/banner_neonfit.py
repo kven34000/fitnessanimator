@@ -8,7 +8,7 @@ W, H = 2560, 1440
 art = Image.open(SRC).convert('RGB')
 bg = art.resize((W, int(art.height * W / art.width)), Image.LANCZOS).crop((0, 0, W, H)).filter(ImageFilter.GaussianBlur(22))
 bg = Image.eval(bg, lambda v: int(v * 0.55))
-sc = 0.78; fg = art.resize((int(W * sc), int(art.height * W / art.width * sc)), Image.LANCZOS)
+sc = float(__import__('os').environ.get('SC', 0.78)); fg = art.resize((int(W * sc), int(art.height * W / art.width * sc)), Image.LANCZOS)
 # feathered edge mask so the smaller foreground melts into the blurred background
 import numpy as np
 m = np.ones((fg.height, fg.width), np.float32); f = 160
@@ -16,7 +16,7 @@ for i in range(f):
     k = i / f; m[:, i] *= k; m[:, -1 - i] *= k; m[i, :] *= k; m[-1 - i, :] *= k
 mask = Image.fromarray((m * 255).astype('uint8'))
 HX = 1720  # hero centre x (to the right of the name)
-can = bg.copy(); can.paste(fg, (HX - fg.width // 2, 230), mask)
+FY = int(__import__('os').environ.get('FY', 230)); can = bg.copy(); can.paste(fg, (HX - fg.width // 2, FY), mask)
 can = can.convert('RGBA')
 def txt(t, size, col=(255, 255, 255), stroke=8, glow=18):
     return R.text_img(t, R.font(R.F_RUSSO, size), col + (255,), stroke=stroke, stroke_fill=(0, 0, 0), glow=glow, glowcol=R.RED)

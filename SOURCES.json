@@ -194,8 +194,23 @@
   "channel_id": "UCqIsrFnUnBLfOkn9w1KkdcA",
   "handle": "@neonfitanime",
   "banner_art": "jUIqdHYLD0",
-  "banner": "9ZbUqEfNYZ",
-  "avatar": "BhiTihhoQR",
-  "watermark": "ov3V3v9829"
+  "banner": "ksXF5pe16B",
+  "avatar": "UPfjgviwny",
+  "watermark": "ov3V3v9829",
+  "banner_v1": "9ZbUqEfNYZ",
+  "avatar_v1": "BhiTihhoQR",
+  "_v2": "banner: SC=0.56 FY=338 python3 covers/banner_neonfit.py covers/banner_neonfit_art.png (hero to abs inside desktop band); avatar: square crop of banner art x1376 y300 S960"
+ },
+ "youtube_neonfit": {
+  "_note": "scheduled 2026-11-27 17:00 America/New_York, audio tracks ES/FR/AR added",
+  "01": "B96a_IUw_xo",
+  "02": "U5v8wYEkQhQ",
+  "03": "8ULR_QbgWKo",
+  "04": "HDWpYsWJ2Ww",
+  "05": "rXcF5Y24xzY",
+  "06": "Y3pRlf5wlkI",
+  "07": "WiahVUhCG-4",
+  "08": "USaK7K4InI8",
+  "09": "ivYb_5Bal1k"
  }
 }
