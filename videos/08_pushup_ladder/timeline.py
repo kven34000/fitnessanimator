@@ -44,8 +44,8 @@ chip('TRUE FAILURE', w(8, 0.35), S[9], RC + 60, 410, 'on', 56); PUNCH.append(w(8
 meter(w(8, 0.5), S[9], 'EFFORT', RC + 60, 600, to=1.0)
 chip('NOT ONE MORE REP', w(8, 0.75), S[9], RC + 60, 760, 'n', 44)
 ex('flex', S[9], S[10], x=620, frames=[1, 3], glow=[(FCH, w(9, 0.4))])
-cal(w(9, 0.05), S[10], 1250, 380, '2 MONTHS')
-big('50+', w(9, 0.55), S[10], x=1650, y=420, size=170); PUNCH.append(w(9, 0.55))
+cal(w(9, 0.05), S[10], 1180, 380, '2 MONTHS')
+big('50+', w(9, 0.55), S[10], x=1720, y=400, size=150); PUNCH.append(w(9, 0.55))
 chip('IN ONE SET', w(9, 0.7), S[10], 1450, 760, 'on', 50, anchor='c')
 
 # C. the ladder
@@ -90,7 +90,7 @@ img('notebook', w(17, 0.62), S[18], 1450, 560, 360)
 chip('MAKE A SIMPLE PLAN', w(17, 0.7), S[18], 1450, 820, 'on', 46, anchor='c'); PUNCH.append(w(17, 0.7))
 ex('notepad', S[18], S[19], x=560, y=960)
 card(w(18, 0.05), S[19], 1400, 360, ['THE PLAN', 'PUSH-UPS / PULLS', 'SQUATS / HOLDS'])
-cal(w(18, 0.6), S[19], 1400, 790, '1 MONTH')
+chip('FOR 1 MONTH', w(18, 0.6), S[19], 1400, 720, 'on', 56, anchor='c')
 loc(S[19], S[20], 'calipark')
 ex('thumbs2', S[19], S[20], x=420, sc=0.9)
 for j, (nm, x_, lab) in enumerate((('handstand', 900, 'HANDSTAND'), ('lsit', 1270, 'L-SIT'), ('planche', 1650, 'PLANCHE'))):
